@@ -1,0 +1,60 @@
+name: 'Auto Releaser'
+description: 'Automate releases by creating PRs on tag push and releases on PR merge'
+author: 'fedi-libs'
+
+branding:
+  icon: 'tag'
+  color: 'green'
+
+inputs:
+  mode:
+    description: 'Operation mode (pr, release, or auto). Auto detects from event type.'
+    required: false
+    default: 'auto'
+  adapter:
+    description: 'Commit parser adapter (conventional, regex, simple)'
+    required: false
+    default: 'conventional'
+  main_branch:
+    description: 'Target branch for PR creation'
+    required: false
+    default: 'main'
+  changelog_path:
+    description: 'Path to CHANGELOG.md'
+    required: false
+    default: 'CHANGELOG.md'
+  pattern:
+    description: 'Custom regex pattern when using regex adapter'
+    required: false
+    default: ''
+  github_token:
+    description: 'GitHub Token for creating PRs and Releases'
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+        cache: true
+    
+    - name: Build and Run Releaser
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: |
+        go build -o auto-releaser main.go
+        ./auto-releaser
+      env:
+        INPUT_MODE: ${{ inputs.mode }}
+        INPUT_ADAPTER: ${{ inputs.adapter }}
+        INPUT_MAIN_BRANCH: ${{ inputs.main_branch }}
+        INPUT_CHANGELOG_PATH: ${{ inputs.changelog_path }}
+        INPUT_PATTERN: ${{ inputs.pattern }}
+        GH_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
