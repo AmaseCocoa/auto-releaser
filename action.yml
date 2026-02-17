@@ -1,6 +1,6 @@
 name: 'Auto Releaser'
 description: 'Automate releases by creating PRs on tag push and releases on PR merge'
-author: 'fedi-libs'
+author: 'AmaseCocoa'
 
 branding:
   icon: 'tag'
@@ -8,9 +8,8 @@ branding:
 
 inputs:
   mode:
-    description: 'Operation mode (pr, release, or auto). Auto detects from event type.'
-    required: false
-    default: 'auto'
+    description: 'Operation mode (pr, release).'
+    required: true
   adapter:
     description: 'Commit parser adapter (conventional, regex, simple)'
     required: false

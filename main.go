@@ -128,7 +128,7 @@ func loadConfig() (*Config, error) {
 	eventAction := os.Getenv("GITHUB_EVENT_ACTION")
 	isMerged := os.Getenv("GITHUB_EVENT_PULL_REQUEST_MERGED") == "true"
 
-	mode := determineMode(eventName, eventAction, isMerged)
+	mode := determineMode()
 
 	cfg := &Config{
 		Mode:          mode,
@@ -160,21 +160,8 @@ func loadConfig() (*Config, error) {
 	return cfg, nil
 }
 
-func determineMode(eventName, eventAction string, isMerged bool) string {
-	inputMode := os.Getenv("INPUT_MODE")
-	if inputMode != "" {
-		return inputMode
-	}
-
-	if eventName == "push" && strings.HasPrefix(os.Getenv("GITHUB_REF"), "refs/tags/") {
-		return "pr"
-	}
-
-	if eventName == "pull_request" && eventAction == "closed" && isMerged {
-		return "release"
-	}
-
-	return "pr"
+func determineMode() string {
+	return os.Getenv("INPUT_MODE")
 }
 
 func getEnv(key, defaultValue string) string {
